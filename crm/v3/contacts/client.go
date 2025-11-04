@@ -1,3 +1,4 @@
+// Package contacts specifies the client methods for the HubSpot CRM Contacts API
 package contacts
 
 import (

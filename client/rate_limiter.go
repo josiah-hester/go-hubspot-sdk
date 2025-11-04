@@ -18,7 +18,7 @@ type RateLimiter struct {
 	dailyResetTime time.Time
 }
 
-// RateLimiter manages rate limiting for API requests
+// NewRateLimiter manages rate limiting for API requests
 func NewRateLimiter(maxBurst int) *RateLimiter {
 	// Convert requests per 10 seconds to per-second rate
 	requestsPerSecond := float64(maxBurst) / 10.0

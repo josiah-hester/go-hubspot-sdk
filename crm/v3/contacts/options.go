@@ -23,8 +23,8 @@ func WithAssociations(associations []string) GetContactOption {
 	}
 }
 
-// WithIdProperty specifies the property to use as the contact identifier
-func WithIdProperty(property string) GetContactOption {
+// WithIDProperty specifies the property to use as the contact identifier
+func WithIDProperty(property string) GetContactOption {
 	return func(req *client.Request) {
 		req.AddQueryParam("idProperty", property)
 	}

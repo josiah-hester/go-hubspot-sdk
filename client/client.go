@@ -1,3 +1,4 @@
+// Package client provides a core client for the HubSpot API
 package client
 
 import (
@@ -59,7 +60,7 @@ func (c *Client) Do(ctx context.Context, req *Request) (*Response, error) {
 // buildChain constructs the complete middleware chain
 func (c *Client) buildChain() Handler {
 	// Start with the HTTP handler (innermost)
-	var handler Handler = c.httpMiddleware()
+	handler := c.httpMiddleware()
 
 	// Wrap with retry middleware
 	handler = c.wrapRetryMiddleware(handler)

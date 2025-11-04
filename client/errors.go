@@ -14,7 +14,7 @@ type HubSpotError struct {
 	ErrorType     string // "RATE_LIMIT", "VALIDATION_ERROR", etc.
 	Category      string
 	PolicyName    string // "DAILY" or "TEN_SECONDLY_ROLLING"
-	CorrelationId string
+	CorrelationID string
 
 	// Used to deteremine if request should retry
 	IsRetryable bool
@@ -60,7 +60,7 @@ func ParseHubSpotError(statusCode int, body []byte, headers http.Header) *HubSpo
 		ErrorType     string `json:"errorType"`
 		Category      string `json:"category"`
 		PolicyName    string `json:"policyName"`
-		CorrelationId string `json:"correlationId"`
+		CorrelationID string `json:"correlationId"`
 	}
 
 	if unmarshalErr := json.Unmarshal(body, &hubspotResp); unmarshalErr == nil {
@@ -68,7 +68,7 @@ func ParseHubSpotError(statusCode int, body []byte, headers http.Header) *HubSpo
 		err.ErrorType = hubspotResp.ErrorType
 		err.Category = hubspotResp.Category
 		err.PolicyName = hubspotResp.PolicyName
-		err.CorrelationId = hubspotResp.CorrelationId
+		err.CorrelationID = hubspotResp.CorrelationID
 	}
 
 	// Determine if retryable
