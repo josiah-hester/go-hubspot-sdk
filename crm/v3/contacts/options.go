@@ -31,11 +31,9 @@ func WithIDProperty(property string) GetContactOption {
 }
 
 // WithArchived includes archived contacts in results
-func WithArchived(archived bool) GetContactOption {
+func WithArchived() GetContactOption {
 	return func(req *client.Request) {
-		if archived {
-			req.AddQueryParam("archived", "true")
-		}
+		req.AddQueryParam("archived", "true")
 	}
 }
 
