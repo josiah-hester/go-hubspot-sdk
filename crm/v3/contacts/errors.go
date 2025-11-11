@@ -3,7 +3,7 @@ package contacts
 import (
 	"fmt"
 
-	"github.com/aacc-dev/go-hubspot-sdk/client"
+	"github.com/josiah-hester/go-hubspot-sdk/client"
 )
 
 // ContactNotFoundError is returned when a contact is not found

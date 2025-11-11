@@ -3,7 +3,7 @@ package lists
 import (
 	"fmt"
 
-	"github.com/aacc-dev/go-hubspot-sdk/client"
+	"github.com/josiah-hester/go-hubspot-sdk/client"
 )
 
 // ListNotFoundError is returned when a list is not found

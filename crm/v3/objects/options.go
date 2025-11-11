@@ -3,7 +3,7 @@ package objects
 import (
 	"strings"
 
-	"github.com/aacc-dev/go-hubspot-sdk/client"
+	"github.com/josiah-hester/go-hubspot-sdk/client"
 )
 
 // ObjectsOption is a functional option for Object calls Query Parameters

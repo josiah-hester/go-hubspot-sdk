@@ -3,7 +3,7 @@ package objects
 import (
 	"fmt"
 
-	"github.com/aacc-dev/go-hubspot-sdk/client"
+	"github.com/josiah-hester/go-hubspot-sdk/client"
 )
 
 // ObjectNotFoundError is returned when an object is not found

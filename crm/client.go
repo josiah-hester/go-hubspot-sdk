@@ -1,9 +1,9 @@
 package crm
 
 import (
-	"github.com/aacc-dev/go-hubspot-sdk/client"
-	v3 "github.com/aacc-dev/go-hubspot-sdk/crm/v3"
-	v4 "github.com/aacc-dev/go-hubspot-sdk/crm/v4"
+	"github.com/josiah-hester/go-hubspot-sdk/client"
+	v3 "github.com/josiah-hester/go-hubspot-sdk/crm/v3"
+	v4 "github.com/josiah-hester/go-hubspot-sdk/crm/v4"
 )
 
 // CRMClient provides access to all CRM API versions

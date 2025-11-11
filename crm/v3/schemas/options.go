@@ -1,6 +1,6 @@
 package schemas
 
-import "github.com/aacc-dev/go-hubspot-sdk/client"
+import "github.com/josiah-hester/go-hubspot-sdk/client"
 
 // SchemaOption is a functional option for the Schemas API
 type SchemaOption func(*client.Request)

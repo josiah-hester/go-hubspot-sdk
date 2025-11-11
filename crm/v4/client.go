@@ -1,6 +1,6 @@
 package v4
 
-import "github.com/aacc-dev/go-hubspot-sdk/client"
+import "github.com/josiah-hester/go-hubspot-sdk/client"
 
 // ClientV4 provides access to CRM v4 API endpoints
 type ClientV4 struct {

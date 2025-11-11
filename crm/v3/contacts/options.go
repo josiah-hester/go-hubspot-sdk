@@ -3,7 +3,7 @@ package contacts
 import (
 	"strings"
 
-	"github.com/aacc-dev/go-hubspot-sdk/client"
+	"github.com/josiah-hester/go-hubspot-sdk/client"
 )
 
 // GetContactOption is a functional option for GetContact

@@ -5,8 +5,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/aacc-dev/go-hubspot-sdk/client"
-	"github.com/aacc-dev/go-hubspot-sdk/internal/tools"
+	"github.com/josiah-hester/go-hubspot-sdk/client"
+	"github.com/josiah-hester/go-hubspot-sdk/internal/tools"
 )
 
 type Client struct {

@@ -3,7 +3,7 @@ package tickets
 import (
 	"strings"
 
-	"github.com/aacc-dev/go-hubspot-sdk/client"
+	"github.com/josiah-hester/go-hubspot-sdk/client"
 )
 
 type TicketOption func(*client.Request)

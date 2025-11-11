@@ -1,6 +1,6 @@
 package v3
 
-import "github.com/aacc-dev/go-hubspot-sdk/client"
+import "github.com/josiah-hester/go-hubspot-sdk/client"
 
 // ClientV3 provides access to CRM v3 API endpoints
 type ClientV3 struct {

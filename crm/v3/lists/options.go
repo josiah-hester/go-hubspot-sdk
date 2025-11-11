@@ -3,7 +3,7 @@ package lists
 import (
 	"fmt"
 
-	"github.com/aacc-dev/go-hubspot-sdk/client"
+	"github.com/josiah-hester/go-hubspot-sdk/client"
 )
 
 // GetListOption is a functional option for GetList methods (GetListById, GetListByName, GetListsByIDs)
