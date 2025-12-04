@@ -1,6 +1,7 @@
 package objects
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/josiah-hester/go-hubspot-sdk/client"
@@ -13,7 +14,7 @@ type ObjectsOption func(*client.Request)
 func WithLimit(limit int) ObjectsOption {
 	return func(req *client.Request) {
 		if limit > 0 {
-			req.AddQueryParam("limit", string(rune(limit)))
+			req.AddQueryParam("limit", fmt.Sprintf("%d", limit))
 		}
 	}
 }

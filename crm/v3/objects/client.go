@@ -32,7 +32,7 @@ func NewClient(apiClient *client.Client) *Client {
 // WithPropertiesWithHistory
 // WithAssociations
 // WithArchived
-func (c *Client) ListObjects(ctx context.Context, objectType string, opts ...ObjectsOption) ([]Object, string, error) {
+func (c *Client) ListObjects(ctx context.Context, objectType string, opts ...ObjectsOption) ([]Object, *Paging, error) {
 	req := client.NewRequest("GET", fmt.Sprintf("/crm/v3/objects/%s", objectType))
 	req.WithContext(ctx)
 	req.WithResourceType("objects")
@@ -44,19 +44,19 @@ func (c *Client) ListObjects(ctx context.Context, objectType string, opts ...Obj
 
 	resp, err := c.apiClient.Do(ctx, req)
 	if err != nil {
-		return nil, "", ParseObjectError(err, objectType)
+		return nil, nil, ParseObjectError(err, objectType)
 	}
 
 	var objResp ListObjectsResponse
 	if err := json.Unmarshal(resp.Body, &objResp); err != nil {
-		return nil, "", fmt.Errorf("failed to unmarshal object response: %w", err)
+		return nil, nil, fmt.Errorf("failed to unmarshal object response: %w", err)
 	}
 
 	if len(objResp.Results) > 0 {
-		return objResp.Results, objResp.Paging.Next.After, nil
+		return objResp.Results, &objResp.Paging, nil
 	}
 
-	return nil, "", fmt.Errorf("no objects found for type %s", objectType)
+	return nil, nil, fmt.Errorf("no objects found for type %s", objectType)
 }
 
 // CreateObject creates a new HubSpot object
@@ -199,10 +199,16 @@ func (c *Client) BatchReadObjects(ctx context.Context, objectType string, input 
 		return nil, fmt.Errorf("failed to unmarshal object response: %w", err)
 	}
 
+	var errors string
 	if len(obj.Errors) > 0 {
+		errors += "some errors occurred in the batch request: "
 		for _, err := range obj.Errors {
-			fmt.Printf("some errors occurred in the batch request: %v", ParseObjectError(&err, objectType))
+			errors += fmt.Sprintf("%v, ", ParseObjectError(&err, objectType))
 		}
+	}
+
+	if errors != "" {
+		return &obj, fmt.Errorf("%s", errors)
 	}
 
 	return &obj, nil
@@ -225,10 +231,16 @@ func (c *Client) BatchCreateObjects(ctx context.Context, objectType string, inpu
 		return nil, fmt.Errorf("failed to ubmarshal object response: %w", err)
 	}
 
+	var errors string
 	if len(obj.Errors) > 0 {
+		errors += "some errors occurred in the batch request: "
 		for _, err := range obj.Errors {
-			fmt.Printf("some errors occurred in the batch request: %v", ParseObjectError(&err, objectType))
+			errors += fmt.Sprintf("%v, ", ParseObjectError(&err, objectType))
 		}
+	}
+
+	if errors != "" {
+		return &obj, fmt.Errorf("%s", errors)
 	}
 
 	return &obj, nil
@@ -251,10 +263,16 @@ func (c *Client) BatchUpdateObjects(ctx context.Context, objectType string, inpu
 		return nil, fmt.Errorf("failed to ubmarshal object response: %w", err)
 	}
 
+	var errors string
 	if len(obj.Errors) > 0 {
+		errors += "some errors occurred in the batch request: "
 		for _, err := range obj.Errors {
-			fmt.Printf("some errors occurred in the batch request: %v", ParseObjectError(&err, objectType))
+			errors += fmt.Sprintf("%v, ", ParseObjectError(&err, objectType))
 		}
+	}
+
+	if errors != "" {
+		return &obj, fmt.Errorf("%s", errors)
 	}
 
 	return &obj, nil
@@ -277,10 +295,16 @@ func (c *Client) BatchCreateOrUpdateObjects(ctx context.Context, objectType stri
 		return nil, fmt.Errorf("failed to ubmarshal object response: %w", err)
 	}
 
+	var errors string
 	if len(obj.Errors) > 0 {
+		errors += "some errors occurred in the batch request: "
 		for _, err := range obj.Errors {
-			fmt.Printf("some errors occurred in the batch request: %v", ParseObjectError(&err, objectType))
+			errors += fmt.Sprintf("%v, ", ParseObjectError(&err, objectType))
 		}
+	}
+
+	if errors != "" {
+		return &obj, fmt.Errorf("%s", errors)
 	}
 
 	return &obj, nil
@@ -303,11 +327,18 @@ func (c *Client) BatchArchiveObjects(ctx context.Context, objectType string, inp
 		return nil, fmt.Errorf("failed to ubmarshal object response: %w", err)
 	}
 
+	var errors string
 	if len(obj.Errors) > 0 {
+		errors += "some errors occurred in the batch request: "
 		for _, err := range obj.Errors {
-			fmt.Printf("some errors occurred in the batch request: %v", ParseObjectError(&err, objectType))
+			errors += fmt.Sprintf("%v, ", ParseObjectError(&err, objectType))
 		}
 	}
+
+	if errors != "" {
+		return &obj, fmt.Errorf("%s", errors)
+	}
+
 	return &obj, nil
 }
 
@@ -326,8 +357,8 @@ func (c *Client) SearchObjects(ctx context.Context, objectType string, input *Se
 	}
 
 	var obj SearchObjectsResponse
-	if err := tools.NewRequiredTagStruct(obj).UnmarhsalJSON(resp.Body); err != nil {
-		return nil, fmt.Errorf("failed to ubmarshal object response: %w", err)
+	if err := tools.NewRequiredTagStruct(&obj).UnmarhsalJSON(resp.Body); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal object response: %w", err)
 	}
 
 	if len(obj.Results) == 0 {
