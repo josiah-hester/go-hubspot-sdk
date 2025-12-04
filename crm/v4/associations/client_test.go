@@ -45,15 +45,22 @@ func TestNewClient(t *testing.T) {
 
 // TestCreateAssociation tests creating an association
 func TestCreateAssociation_Success(t *testing.T) {
+	responseJSON := `{
+		"fromObjectTypeId": "0-1",
+		"fromObjectId": 123,
+		"toObjectTypeId": "0-2",
+		"toObjectId": 456,
+		"labels": ["Primary"]
+	}`
+
 	server, assocClient := setupMockServer(t, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "PUT", r.Method)
 		assert.Equal(t, "/crm/v4/objects/contacts/123/associations/companies/456", r.URL.Path)
-		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write([]byte(`{"status": "success"}`))
+		respondJSON(w, http.StatusOK, responseJSON)
 	})
 	defer server.Close()
 
-	err := assocClient.CreateAssociation(context.Background(),
+	resp, err := assocClient.CreateAssociation(context.Background(),
 		"contacts", "123",
 		"companies", "456",
 		[]AssociationSpec{
@@ -64,17 +71,31 @@ func TestCreateAssociation_Success(t *testing.T) {
 		})
 
 	require.NoError(t, err)
+	assert.NotNil(t, resp)
+	assert.Equal(t, "0-1", resp.FromObjectTypeID)
+	assert.Equal(t, 123, resp.FromObjectID)
+	assert.Equal(t, "0-2", resp.ToObjectTypeID)
+	assert.Equal(t, 456, resp.ToObjectID)
+	assert.Len(t, resp.Labels, 1)
+	assert.Equal(t, "Primary", resp.Labels[0])
 }
 
 func TestCreateAssociation_UserDefined(t *testing.T) {
+	responseJSON := `{
+		"fromObjectTypeId": "0-1",
+		"fromObjectId": 123,
+		"toObjectTypeId": "0-2",
+		"toObjectId": 456,
+		"labels": ["Decision maker"]
+	}`
+
 	server, assocClient := setupMockServer(t, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "PUT", r.Method)
-		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write([]byte(`{"status": "success"}`))
+		respondJSON(w, http.StatusOK, responseJSON)
 	})
 	defer server.Close()
 
-	err := assocClient.CreateAssociation(context.Background(),
+	resp, err := assocClient.CreateAssociation(context.Background(),
 		"contacts", "123",
 		"companies", "456",
 		[]AssociationSpec{
@@ -85,17 +106,27 @@ func TestCreateAssociation_UserDefined(t *testing.T) {
 		})
 
 	require.NoError(t, err)
+	assert.NotNil(t, resp)
+	assert.Len(t, resp.Labels, 1)
+	assert.Equal(t, "Decision maker", resp.Labels[0])
 }
 
 func TestCreateAssociation_IntegratorDefined(t *testing.T) {
+	responseJSON := `{
+		"fromObjectTypeId": "0-1",
+		"fromObjectId": 123,
+		"toObjectTypeId": "0-3",
+		"toObjectId": 789,
+		"labels": ["Custom integration label"]
+	}`
+
 	server, assocClient := setupMockServer(t, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "PUT", r.Method)
-		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write([]byte(`{"status": "success"}`))
+		respondJSON(w, http.StatusOK, responseJSON)
 	})
 	defer server.Close()
 
-	err := assocClient.CreateAssociation(context.Background(),
+	resp, err := assocClient.CreateAssociation(context.Background(),
 		"contacts", "123",
 		"deals", "789",
 		[]AssociationSpec{
@@ -106,18 +137,28 @@ func TestCreateAssociation_IntegratorDefined(t *testing.T) {
 		})
 
 	require.NoError(t, err)
+	assert.NotNil(t, resp)
+	assert.Len(t, resp.Labels, 1)
+	assert.Equal(t, "Custom integration label", resp.Labels[0])
 }
 
 func TestCreateAssociation_MultipleSpecs(t *testing.T) {
+	responseJSON := `{
+		"fromObjectTypeId": "0-1",
+		"fromObjectId": 123,
+		"toObjectTypeId": "0-2",
+		"toObjectId": 456,
+		"labels": ["Primary", "Decision maker"]
+	}`
+
 	server, assocClient := setupMockServer(t, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "PUT", r.Method)
-		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write([]byte(`{"status": "success"}`))
+		respondJSON(w, http.StatusOK, responseJSON)
 	})
 	defer server.Close()
 
 	// Test creating multiple association types at once
-	err := assocClient.CreateAssociation(context.Background(),
+	resp, err := assocClient.CreateAssociation(context.Background(),
 		"contacts", "123",
 		"companies", "456",
 		[]AssociationSpec{
@@ -132,6 +173,10 @@ func TestCreateAssociation_MultipleSpecs(t *testing.T) {
 		})
 
 	require.NoError(t, err)
+	assert.NotNil(t, resp)
+	assert.Len(t, resp.Labels, 2)
+	assert.Contains(t, resp.Labels, "Primary")
+	assert.Contains(t, resp.Labels, "Decision maker")
 }
 
 func TestCreateAssociation_Error(t *testing.T) {
@@ -140,7 +185,7 @@ func TestCreateAssociation_Error(t *testing.T) {
 	})
 	defer server.Close()
 
-	err := assocClient.CreateAssociation(context.Background(),
+	resp, err := assocClient.CreateAssociation(context.Background(),
 		"contacts", "123",
 		"companies", "999",
 		[]AssociationSpec{
@@ -151,6 +196,7 @@ func TestCreateAssociation_Error(t *testing.T) {
 		})
 
 	require.Error(t, err)
+	assert.Nil(t, resp)
 }
 
 // TestDeleteAssociation tests deleting an association
@@ -390,13 +436,20 @@ func TestAssociations_MultipleObjectTypes(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
+			responseJSON := `{
+				"fromObjectTypeId": "0-1",
+				"fromObjectId": 123,
+				"toObjectTypeId": "0-2",
+				"toObjectId": 456,
+				"labels": []
+			}`
+
 			server, assocClient := setupMockServer(t, func(w http.ResponseWriter, r *http.Request) {
-				w.WriteHeader(http.StatusOK)
-				_, _ = w.Write([]byte(`{"status": "success"}`))
+				respondJSON(w, http.StatusOK, responseJSON)
 			})
 			defer server.Close()
 
-			err := assocClient.CreateAssociation(context.Background(),
+			resp, err := assocClient.CreateAssociation(context.Background(),
 				tc.fromObjectType, "123",
 				tc.toObjectType, "456",
 				[]AssociationSpec{
@@ -407,6 +460,7 @@ func TestAssociations_MultipleObjectTypes(t *testing.T) {
 				})
 
 			require.NoError(t, err)
+			assert.NotNil(t, resp)
 		})
 	}
 }

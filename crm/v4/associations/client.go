@@ -21,16 +21,25 @@ func NewClient(apiClient *client.Client) *Client {
 	}
 }
 
-// CreateAssociation creates an association between two objects
-func (c *Client) CreateAssociation(ctx context.Context, fromObjectType, fromObjectID, toObjectType, toObjectID string, associationSpecs []AssociationSpec) error {
+// CreateAssociation creates an association between two objects and returns the association details
+func (c *Client) CreateAssociation(ctx context.Context, fromObjectType, fromObjectID, toObjectType, toObjectID string, associationSpecs []AssociationSpec) (*AssociationResponse, error) {
 	req := client.NewRequest("PUT", fmt.Sprintf("/crm/v4/objects/%s/%s/associations/%s/%s",
 		fromObjectType, fromObjectID, toObjectType, toObjectID))
 	req.WithContext(ctx)
 	req.WithResourceType("associations")
 	req.WithBody(associationSpecs)
 
-	_, err := c.apiClient.Do(ctx, req)
-	return err
+	resp, err := c.apiClient.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	var assocResp AssociationResponse
+	if err := json.Unmarshal(resp.Body, &assocResp); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal association response: %w", err)
+	}
+
+	return &assocResp, nil
 }
 
 // DeleteAssociation removes an association between two objects

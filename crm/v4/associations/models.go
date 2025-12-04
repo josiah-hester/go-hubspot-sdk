@@ -55,13 +55,13 @@ type BatchAssociationInput struct {
 	} `json:"inputs"`
 }
 
-// AssociationResponse represents response from association operations
+// AssociationResponse represents response from creating/updating association operations
 type AssociationResponse struct {
-	FromObjectTypeID string             `json:"fromObjectTypeId"`
-	FromObjectID     string             `json:"fromObjectId"`
-	ToObjectTypeID   string             `json:"toObjectTypeId"`
-	ToObjectID       string             `json:"toObjectId"`
-	Labels           []AssociationLabel `json:"labels"`
+	FromObjectTypeID string   `json:"fromObjectTypeId"`
+	FromObjectID     int      `json:"fromObjectId"`
+	ToObjectTypeID   string   `json:"toObjectTypeId"`
+	ToObjectID       int      `json:"toObjectId"`
+	Labels           []string `json:"labels"`
 }
 
 // ListAssociationsResponse represents response from listing associations
