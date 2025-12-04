@@ -42,7 +42,7 @@ func (c *Client) GetAllSchemas(ctx context.Context, opts ...SchemaOption) (*GetA
 	}
 
 	var schemas GetAllSchemasResponse
-	if err := tools.NewRequiredTagStruct(schemas).UnmarhsalJSON(resp.Body); err != nil {
+	if err := tools.NewRequiredTagStruct(&schemas).UnmarhsalJSON(resp.Body); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal schemas response: %w", err)
 	}
 
@@ -65,7 +65,7 @@ func (c *Client) GetExistingSchema(ctx context.Context, objectType string) (*Sch
 	}
 
 	var schema Schema
-	if err := tools.NewRequiredTagStruct(schema).UnmarhsalJSON(resp.Body); err != nil {
+	if err := tools.NewRequiredTagStruct(&schema).UnmarhsalJSON(resp.Body); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal schema response: %w", err)
 	}
 
@@ -77,6 +77,7 @@ func (c *Client) CreateNewSchema(ctx context.Context, input *CreateNewSchemaInpu
 	req := client.NewRequest("POST", "/crm-object-schemas/v3/schemas")
 	req.WithContext(ctx)
 	req.WithResourceType("schemas")
+	req.WithBody(input)
 
 	resp, err := c.apiClient.Do(ctx, req)
 	if err != nil {
@@ -84,7 +85,7 @@ func (c *Client) CreateNewSchema(ctx context.Context, input *CreateNewSchemaInpu
 	}
 
 	var schema Schema
-	if err := tools.NewRequiredTagStruct(schema).UnmarhsalJSON(resp.Body); err != nil {
+	if err := tools.NewRequiredTagStruct(&schema).UnmarhsalJSON(resp.Body); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal schema response: %w", err)
 	}
 
@@ -96,6 +97,7 @@ func (c *Client) CreateNewAssociationSchema(ctx context.Context, objectType stri
 	req := client.NewRequest("POST", fmt.Sprintf("/crm-object-schemas/v3/schemas/%s/associations", objectType))
 	req.WithContext(ctx)
 	req.WithResourceType("schemas")
+	req.WithBody(input)
 
 	resp, err := c.apiClient.Do(ctx, req)
 	if err != nil {
@@ -103,7 +105,7 @@ func (c *Client) CreateNewAssociationSchema(ctx context.Context, objectType stri
 	}
 
 	var assocResp CreateNewAssociationSchemaResponse
-	if err := tools.NewRequiredTagStruct(assocResp).UnmarhsalJSON(resp.Body); err != nil {
+	if err := tools.NewRequiredTagStruct(&assocResp).UnmarhsalJSON(resp.Body); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal schema response: %w", err)
 	}
 
@@ -115,6 +117,7 @@ func (c *Client) UpdateSchema(ctx context.Context, objectType string, input *Upd
 	req := client.NewRequest("PATCH", fmt.Sprintf("/crm-object-schemas/v3/schemas/%s", objectType))
 	req.WithContext(ctx)
 	req.WithResourceType("schemas")
+	req.WithBody(input)
 
 	resp, err := c.apiClient.Do(ctx, req)
 	if err != nil {
@@ -122,7 +125,7 @@ func (c *Client) UpdateSchema(ctx context.Context, objectType string, input *Upd
 	}
 
 	var schema Schema
-	if err := tools.NewRequiredTagStruct(schema).UnmarhsalJSON(resp.Body); err != nil {
+	if err := tools.NewRequiredTagStruct(&schema).UnmarhsalJSON(resp.Body); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal schema response: %w", err)
 	}
 
