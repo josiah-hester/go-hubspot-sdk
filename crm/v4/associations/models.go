@@ -1,5 +1,17 @@
 package associations
 
+// Association category constants
+const (
+	// AssociationCategoryHubSpotDefined represents HubSpot's predefined associations
+	AssociationCategoryHubSpotDefined = "HUBSPOT_DEFINED"
+
+	// AssociationCategoryIntegratorDefined represents integrator-defined associations
+	AssociationCategoryIntegratorDefined = "INTEGRATOR_DEFINED"
+
+	// AssociationCategoryUserDefined represents user-defined associations
+	AssociationCategoryUserDefined = "USER_DEFINED"
+)
+
 // AssociationSpec defines an association between two objects
 type AssociationSpec struct {
 	AssociationCategory string `json:"associationCategory"`

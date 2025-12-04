@@ -56,7 +56,80 @@ func TestCreateAssociation_Success(t *testing.T) {
 	err := assocClient.CreateAssociation(context.Background(),
 		"contacts", "123",
 		"companies", "456",
-		1)
+		[]AssociationSpec{
+			{
+				AssociationCategory: AssociationCategoryHubSpotDefined,
+				AssociationTypeID:   1,
+			},
+		})
+
+	require.NoError(t, err)
+}
+
+func TestCreateAssociation_UserDefined(t *testing.T) {
+	server, assocClient := setupMockServer(t, func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "PUT", r.Method)
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte(`{"status": "success"}`))
+	})
+	defer server.Close()
+
+	err := assocClient.CreateAssociation(context.Background(),
+		"contacts", "123",
+		"companies", "456",
+		[]AssociationSpec{
+			{
+				AssociationCategory: AssociationCategoryUserDefined,
+				AssociationTypeID:   100,
+			},
+		})
+
+	require.NoError(t, err)
+}
+
+func TestCreateAssociation_IntegratorDefined(t *testing.T) {
+	server, assocClient := setupMockServer(t, func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "PUT", r.Method)
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte(`{"status": "success"}`))
+	})
+	defer server.Close()
+
+	err := assocClient.CreateAssociation(context.Background(),
+		"contacts", "123",
+		"deals", "789",
+		[]AssociationSpec{
+			{
+				AssociationCategory: AssociationCategoryIntegratorDefined,
+				AssociationTypeID:   200,
+			},
+		})
+
+	require.NoError(t, err)
+}
+
+func TestCreateAssociation_MultipleSpecs(t *testing.T) {
+	server, assocClient := setupMockServer(t, func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "PUT", r.Method)
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte(`{"status": "success"}`))
+	})
+	defer server.Close()
+
+	// Test creating multiple association types at once
+	err := assocClient.CreateAssociation(context.Background(),
+		"contacts", "123",
+		"companies", "456",
+		[]AssociationSpec{
+			{
+				AssociationCategory: AssociationCategoryHubSpotDefined,
+				AssociationTypeID:   1,
+			},
+			{
+				AssociationCategory: AssociationCategoryUserDefined,
+				AssociationTypeID:   100,
+			},
+		})
 
 	require.NoError(t, err)
 }
@@ -70,7 +143,12 @@ func TestCreateAssociation_Error(t *testing.T) {
 	err := assocClient.CreateAssociation(context.Background(),
 		"contacts", "123",
 		"companies", "999",
-		1)
+		[]AssociationSpec{
+			{
+				AssociationCategory: AssociationCategoryHubSpotDefined,
+				AssociationTypeID:   1,
+			},
+		})
 
 	require.Error(t, err)
 }
@@ -87,7 +165,12 @@ func TestDeleteAssociation_Success(t *testing.T) {
 	err := assocClient.DeleteAssociation(context.Background(),
 		"contacts", "123",
 		"companies", "456",
-		1)
+		[]AssociationSpec{
+			{
+				AssociationCategory: AssociationCategoryHubSpotDefined,
+				AssociationTypeID:   1,
+			},
+		})
 
 	require.NoError(t, err)
 }
@@ -316,7 +399,12 @@ func TestAssociations_MultipleObjectTypes(t *testing.T) {
 			err := assocClient.CreateAssociation(context.Background(),
 				tc.fromObjectType, "123",
 				tc.toObjectType, "456",
-				1)
+				[]AssociationSpec{
+					{
+						AssociationCategory: AssociationCategoryHubSpotDefined,
+						AssociationTypeID:   1,
+					},
+				})
 
 			require.NoError(t, err)
 		})

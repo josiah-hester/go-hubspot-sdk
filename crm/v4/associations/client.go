@@ -22,38 +22,24 @@ func NewClient(apiClient *client.Client) *Client {
 }
 
 // CreateAssociation creates an association between two objects
-func (c *Client) CreateAssociation(ctx context.Context, fromObjectType, fromObjectID, toObjectType, toObjectID string, associationTypeID int) error {
+func (c *Client) CreateAssociation(ctx context.Context, fromObjectType, fromObjectID, toObjectType, toObjectID string, associationSpecs []AssociationSpec) error {
 	req := client.NewRequest("PUT", fmt.Sprintf("/crm/v4/objects/%s/%s/associations/%s/%s",
 		fromObjectType, fromObjectID, toObjectType, toObjectID))
 	req.WithContext(ctx)
 	req.WithResourceType("associations")
-
-	body := []AssociationSpec{
-		{
-			AssociationCategory: "HUBSPOT_DEFINED",
-			AssociationTypeID:   associationTypeID,
-		},
-	}
-	req.WithBody(body)
+	req.WithBody(associationSpecs)
 
 	_, err := c.apiClient.Do(ctx, req)
 	return err
 }
 
 // DeleteAssociation removes an association between two objects
-func (c *Client) DeleteAssociation(ctx context.Context, fromObjectType, fromObjectID, toObjectType, toObjectID string, associationTypeID int) error {
+func (c *Client) DeleteAssociation(ctx context.Context, fromObjectType, fromObjectID, toObjectType, toObjectID string, associationSpecs []AssociationSpec) error {
 	req := client.NewRequest("DELETE", fmt.Sprintf("/crm/v4/objects/%s/%s/associations/%s/%s",
 		fromObjectType, fromObjectID, toObjectType, toObjectID))
 	req.WithContext(ctx)
 	req.WithResourceType("associations")
-
-	body := []AssociationSpec{
-		{
-			AssociationCategory: "HUBSPOT_DEFINED",
-			AssociationTypeID:   associationTypeID,
-		},
-	}
-	req.WithBody(body)
+	req.WithBody(associationSpecs)
 
 	_, err := c.apiClient.Do(ctx, req)
 	return err
