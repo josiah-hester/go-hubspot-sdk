@@ -53,10 +53,26 @@ func (rl *RateLimiter) CheckDailyLimit() bool {
 	return rl.dailyRemaining > 0
 }
 
+// GetDailyLimit returns the current daily limit received from the API response
+func (rl *RateLimiter) GetDailyLimit() int {
+	rl.mu.RLock()
+	defer rl.mu.RUnlock()
+
+	return rl.dailyLimit
+}
+
 // GetDailyRemaining return the current daily remaining quota
 func (rl *RateLimiter) GetDailyRemaining() int {
 	rl.mu.RLock()
 	defer rl.mu.RUnlock()
 
 	return rl.dailyRemaining
+}
+
+// GetDailyResetTime returns the current daily reset time
+func (rl *RateLimiter) GetDailyResetTime() time.Time {
+	rl.mu.RLock()
+	defer rl.mu.RUnlock()
+
+	return rl.dailyResetTime
 }

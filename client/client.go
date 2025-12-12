@@ -11,6 +11,7 @@ import (
 	"math/rand"
 	"net/http"
 	"net/url"
+	"os"
 	"time"
 )
 
@@ -298,4 +299,22 @@ func readResponseBody(httpResp *http.Response) ([]byte, error) {
 // jsonMarshal is a wrapper around json.Marshal for consistency
 func jsonMarshal(v any) ([]byte, error) {
 	return json.Marshal(v)
+}
+
+// PrintRateLimit is used to test and verify the rate limiter is being properly updated
+func (c *Client) PrintRateLimit(writers ...io.Writer) {
+	if len(writers) == 0 {
+		writers = []io.Writer{os.Stdout}
+	}
+	var b []byte
+	b = fmt.Appendf(b, "Daily limit: %d\nDaily remaining: %d\nDaily reset time: %s\n", c.rateLimiter.GetDailyLimit(), c.rateLimiter.GetDailyRemaining(), c.rateLimiter.GetDailyResetTime().String())
+	for _, writer := range writers {
+		n, err := writer.Write(b)
+		if n != len(b) {
+			fmt.Printf("Failed to write all bytes to writer: %d != %d\n", n, len(b))
+		}
+		if err != nil {
+			fmt.Printf("Failed to write to writer: %s\n", err.Error())
+		}
+	}
 }
