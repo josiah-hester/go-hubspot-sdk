@@ -1,9 +1,12 @@
 package client
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"os"
+	"reflect"
+	"strings"
 )
 
 type Logger struct {
@@ -55,5 +58,24 @@ func (l *Logger) Fatal(v ...any) {
 func (l *Logger) Fatalf(format string, v ...any) {
 	for _, logger := range l.loggers {
 		logger.Fatalf(format, v...)
+	}
+}
+
+func (l *Logger) LogStructf(format string, v any) {
+	var printStrs []string
+	val := reflect.ValueOf(v)
+	typeOfS := val.Type()
+
+	if val.Kind() == reflect.Struct {
+		for i := 0; i < val.NumField(); i++ {
+			fieldName := typeOfS.Field(i).Name
+			fieldValue := val.Field(i).Interface()
+			printStrs = append(printStrs, fmt.Sprintf("%s: %v", fieldName, fieldValue))
+		}
+	} else {
+		printStrs = append(printStrs, fmt.Sprintf("%v", val))
+	}
+	for _, logger := range l.loggers {
+		logger.Printf(format, "{"+strings.Join(printStrs, ", ")+"}")
 	}
 }

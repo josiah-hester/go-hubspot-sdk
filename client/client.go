@@ -46,7 +46,7 @@ func NewClient(opts ...Option) (*Client, error) {
 	rateLimiter := NewRateLimiter(cfg.RateLimit.MaxBurst)
 
 	// Initialize the logger
-	logger := NewLogger(cfg.LoggingEnabled, "go_hubspot_sdk_client:", log.LstdFlags|log.Lshortfile, cfg.LogOutputs...)
+	logger := NewLogger(cfg.LoggingEnabled, "GoHubspotSDK-", log.LstdFlags|log.Lshortfile, cfg.LogOutputs...)
 
 	return &Client{
 		config:      cfg,
@@ -252,7 +252,7 @@ func (c *Client) httpMiddleware() Handler {
 		resp := NewResponse(httpResp.StatusCode, respBodyBytes, httpResp.Header)
 		resp.RateLimit = ExtractRateLimitInfo(httpResp.Header)
 
-		c.LogPrintf("Rate Limit: %v", resp.RateLimit)
+		c.LogStructf("Rate Limit: %v", resp.RateLimit)
 
 		// Handle error responses
 		if httpResp.StatusCode >= 400 {
@@ -267,6 +267,12 @@ func (c *Client) httpMiddleware() Handler {
 func (c *Client) LogPrintf(format string, v ...any) {
 	if c.config.LoggingEnabled {
 		c.logger.Printf(format, v...)
+	}
+}
+
+func (c *Client) LogStructf(format string, v any) {
+	if c.config.LoggingEnabled {
+		c.logger.LogStructf(format, v)
 	}
 }
 

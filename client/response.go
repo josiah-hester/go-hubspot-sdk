@@ -19,7 +19,7 @@ type Response struct {
 }
 
 type RateLimitInfo struct {
-	Max             int // Request allowd in window
+	Max             int // Request allowed in window
 	Remaining       int // Request remaining in window
 	DailyLimit      int
 	DailyRemaining  int
