@@ -1,3 +1,4 @@
+// Package crm provides access to the HubSpot CRM API versions
 package crm
 
 import (

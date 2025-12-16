@@ -1,31 +1,22 @@
 # Project Title
 
-Simple overview of use/purpose.
+Hubspot API for Go programming language. Import this package into your project and have easy access to all of the Hubspot API endpoints.
 
 ## Description
 
-An in-depth paragraph about your project and overview of use.
+The Hubspot API for Go is a package for interacting with the Hubspot API. You can use this package to get information about your Hubspot account, communicate with the CRM and CMS.
 
 ## Getting Started
 
-### Dependencies
-
-- Describe any prerequisites, libraries, OS version, etc., needed before installing program.
-- ex. Windows 10
-
 ### Installing
 
-- How/where to download your program
-- Any modifications needed to be made to files/folders
+```
+go get github.com/josiah-hester/hubspot-api-go
+```
 
 ### Executing program
 
-- How to run the program
 - Step-by-step bullets
-
-```
-code blocks for commands
-```
 
 ## Help
 
@@ -39,27 +30,15 @@ command to run if program contains helper info
 
 Contributors names and contact info
 
-ex. Dominique Pizzie  
-ex. [@DomPizzie](https://twitter.com/dompizzie)
+[Josiah Hester](mailto:jhester911@gmail.com)
 
 ## Version History
 
-- 0.2
-  - Various bug fixes and optimizations
-  - See [commit change]() or See [release history]()
-- 0.1
-  - Initial Release
+- 0.0.0
+  - The package is still in early development and is not ready for production use.
 
 ## License
 
-This project is licensed under the [NAME HERE] License - see the LICENSE.md file for details
+This project is licensed under the [Apache 2.0] License - see the LICENSE.md file for details
 
 ## Acknowledgments
-
-Inspiration, code snippets, etc.
-
-- [awesome-readme](https://github.com/matiassingers/awesome-readme)
-- [PurpleBooth](https://gist.github.com/PurpleBooth/109311bb0361f32d87a2)
-- [dbader](https://github.com/dbader/readme-template)
-- [zenorocha](https://gist.github.com/zenorocha/4526327)
-- [fvcproductions](https://gist.github.com/fvcproductions/1bfc2d4aecb01a834b46)
