@@ -1,4 +1,7 @@
 // Package client provides a core client for the HubSpot API
+//
+// This client will be used by other API endpoints to keep a core client to centralize configuration, logging, rate limiting, and error handling
+// All clients that implement this core client are safe for concurrency
 package client
 
 import (
@@ -13,6 +16,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strconv"
 	"time"
 )
 
@@ -27,6 +31,7 @@ type Client struct {
 // Handler represents a function that processes a Request and returns a Response
 type Handler func(req *Request) (*Response, error)
 
+// NewClient creates a new core API client
 func NewClient(opts ...Option) (*Client, error) {
 	cfg := NewConfig()
 
@@ -53,6 +58,7 @@ func NewClient(opts ...Option) (*Client, error) {
 	}, nil
 }
 
+// Do executes the request with context using the core client and responds with the response and/or an error
 func (c *Client) Do(ctx context.Context, req *Request) (*Response, error) {
 	req.Context = ctx
 
@@ -76,6 +82,24 @@ func (c *Client) buildChain() Handler {
 	handler = c.wrapAuthMiddleware(handler)
 
 	return handler
+}
+
+// PrintRateLimit is used to test and verify the rate limiter is being properly updated
+func (c *Client) PrintRateLimit(writers ...io.Writer) {
+	if len(writers) == 0 {
+		writers = []io.Writer{os.Stdout}
+	}
+	var b []byte
+	b = fmt.Appendf(b, "Daily limit: %d\nDaily remaining: %d\nDaily reset time: %s\n", c.rateLimiter.GetDailyLimit(), c.rateLimiter.GetDailyRemaining(), c.rateLimiter.GetDailyResetTime().String())
+	for _, writer := range writers {
+		n, err := writer.Write(b)
+		if n != len(b) {
+			fmt.Printf("Failed to write all bytes to writer: %d != %d\n", n, len(b))
+		}
+		if err != nil {
+			fmt.Printf("Failed to write to writer: %s\n", err.Error())
+		}
+	}
 }
 
 // wrapAuthMiddleware wraps a handler with authentication
@@ -314,20 +338,41 @@ func jsonMarshal(v any) ([]byte, error) {
 	return json.Marshal(v)
 }
 
-// PrintRateLimit is used to test and verify the rate limiter is being properly updated
-func (c *Client) PrintRateLimit(writers ...io.Writer) {
-	if len(writers) == 0 {
-		writers = []io.Writer{os.Stdout}
+// ExtractRateLimitInfo extracts rate limit information from response headers
+func ExtractRateLimitInfo(headers http.Header) RateLimitInfo {
+	info := RateLimitInfo{
+		IntervalMs: 10000,
 	}
-	var b []byte
-	b = fmt.Appendf(b, "Daily limit: %d\nDaily remaining: %d\nDaily reset time: %s\n", c.rateLimiter.GetDailyLimit(), c.rateLimiter.GetDailyRemaining(), c.rateLimiter.GetDailyResetTime().String())
-	for _, writer := range writers {
-		n, err := writer.Write(b)
-		if n != len(b) {
-			fmt.Printf("Failed to write all bytes to writer: %d != %d\n", n, len(b))
-		}
-		if err != nil {
-			fmt.Printf("Failed to write to writer: %s\n", err.Error())
+
+	if maxStr := headers.Get("X-HubSpot-RateLimit-Max"); maxStr != "" {
+		if max, err := strconv.Atoi(maxStr); err == nil {
+			info.Max = max
 		}
 	}
+
+	if remainingStr := headers.Get("X-HubSpot-RateLimit-Remaining"); remainingStr != "" {
+		if remaining, err := strconv.Atoi(remainingStr); err == nil {
+			info.Remaining = remaining
+		}
+	}
+
+	if intervalStr := headers.Get("X-HubSpot-RateLimit-Interval-Milliseconds"); intervalStr != "" {
+		if interval, err := strconv.Atoi(intervalStr); err == nil {
+			info.IntervalMs = interval
+		}
+	}
+
+	if dailyStr := headers.Get("X-HubSpot-RateLimit-Daily"); dailyStr != "" {
+		if daily, err := strconv.Atoi(dailyStr); err == nil {
+			info.DailyLimit = daily
+		}
+	}
+
+	if dailyRemStr := headers.Get("X-HubSpot-RateLimit-Daily-Remaining"); dailyRemStr != "" {
+		if dailyRem, err := strconv.Atoi(dailyRemStr); err == nil {
+			info.DailyRemaining = dailyRem
+		}
+	}
+
+	return info
 }

@@ -8,6 +8,7 @@ import (
 	"time"
 )
 
+// HubSpotError stores the information returned from Hubspot Errors. Implements the error interface.
 type HubSpotError struct {
 	Status        int
 	Message       string
@@ -87,43 +88,4 @@ func isRetryableStatus(statusCode int, policyName string) bool {
 	default:
 		return false
 	}
-}
-
-// ExtractRateLimitInfo extracts rate limit information from response headers
-func ExtractRateLimitInfo(headers http.Header) RateLimitInfo {
-	info := RateLimitInfo{
-		IntervalMs: 10000,
-	}
-
-	if maxStr := headers.Get("X-HubSpot-RateLimit-Max"); maxStr != "" {
-		if max, err := strconv.Atoi(maxStr); err == nil {
-			info.Max = max
-		}
-	}
-
-	if remainingStr := headers.Get("X-HubSpot-RateLimit-Remaining"); remainingStr != "" {
-		if remaining, err := strconv.Atoi(remainingStr); err == nil {
-			info.Remaining = remaining
-		}
-	}
-
-	if intervalStr := headers.Get("X-HubSpot-RateLimit-Interval-Milliseconds"); intervalStr != "" {
-		if interval, err := strconv.Atoi(intervalStr); err == nil {
-			info.IntervalMs = interval
-		}
-	}
-
-	if dailyStr := headers.Get("X-HubSpot-RateLimit-Daily"); dailyStr != "" {
-		if daily, err := strconv.Atoi(dailyStr); err == nil {
-			info.DailyLimit = daily
-		}
-	}
-
-	if dailyRemStr := headers.Get("X-HubSpot-RateLimit-Daily-Remaining"); dailyRemStr != "" {
-		if dailyRem, err := strconv.Atoi(dailyRemStr); err == nil {
-			info.DailyRemaining = dailyRem
-		}
-	}
-
-	return info
 }
